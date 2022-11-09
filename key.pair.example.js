@@ -13,11 +13,12 @@ import { HDKEY, DID } from './lib/esm/index.js';
     console.log('keyPair: ', keyPair);
     console.log('exportKeyPair: ', ed.exportEDKeyPair())
 
-    const subKey = ed.deriveKeyPath("m/0'/0'");
+    const subKey = ed.deriveKeyPath("m/1'/0'");
     console.log('subKey: ', subKey)
     console.log('exportKeyPath: ', ed.exportKeyPath("m/0'/0'"))
+
+    
     const did = new DID(ed.exportEDKeyPair());
     console.log('did: ', did.did());
     console.log('pid: ', await did.pid());
-
 })()
