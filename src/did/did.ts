@@ -38,15 +38,6 @@ export class DID {
       this._privateKey = u8a.fromString(_keyPair.secretKey, 'base64pad');
     }
 
-    /**
-     * This function for generating DID and PeerID
-     * @function getDID()
-     * @property parentKey?: Uin8Array (Optinal) or _privateKey (default)
-     * @returns  {
-     *  PeerId, did 
-     * }
-    */
-
     private _didToBytes(did: string, prefix: Uint8Array): Uint8Array {
       if(!did.startsWith(BASE58_DID_PREFIX)) {
         throw new Error('DID encoding format must be base58btc or should include did:key:xyz... ')
@@ -59,6 +50,13 @@ export class DID {
       return extractBaytes.slice(prefix.length)
     }
 
+    /**
+     * This function extracts Public key from DID - base58btc
+     * @function extractDIDKey(did)
+     * @property did: string
+     * @returns  PublicKey: Uint8Array
+    */
+
     extractDIDKey(did: string): Uint8Array {
       return this._didToBytes(did, EDWARDS_DID_PREFIX);
     }
@@ -69,9 +67,21 @@ export class DID {
       return BASE58_DID_PREFIX + base58Key
     }
 
+    /**
+     * This function makes DID (base58btc) from PublicKey
+     * @function extractDIDKey(did)
+     * @returns  did: string
+    */
     did(): string {
       return this._didFromKeyBytes(this.publicKey, EDWARDS_DID_PREFIX)
     }
+
+    /**
+     * This function makes PeerId KeyPair from DID KeyPair
+     * @function pid(privateKey)
+     * @property privateKey?: Uint8Array
+     * @returns  PeerId KeyPair: json object
+    */
 
     async pid (privateKey?: Uint8Array): Promise<PeerId.JSONPeerId> {
       const key = await this._keyPair(privateKey || this._privateKey);
