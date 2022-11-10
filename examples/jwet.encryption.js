@@ -1,4 +1,4 @@
-import { HDKEY, DID } from './lib/esm/index.js';
+import { HDKEY, DID, EncryptJWT } from '../lib/esm/index.js';
 
 
 (async()=> {
@@ -11,14 +11,20 @@ import { HDKEY, DID } from './lib/esm/index.js';
     
     const keyPair = ed.createEDKeyPair(signature);
     console.log('keyPair: ', keyPair);
-    console.log('exportKeyPair: ', ed.exportEDKeyPair())
+    console.log('exportKeyPair: ', ed.exportEDKeyPair());
 
-    const subKey = ed.deriveKeyPath("m/1'/0'");
-    console.log('subKey: ', subKey)
-    console.log('exportKeyPath: ', ed.exportKeyPath("m/0'/0'"))
-
-    
     const did = new DID(ed.exportEDKeyPair());
     console.log('did: ', did.did());
     console.log('pid: ', await did.pid());
+
+
+    const jwet = await new EncryptJWT({ aud: did.did(), iat: undefined, box: 'uPort Developer' })
+    .setIssuedAt()
+    .setNotBefore(Math.floor(Date.now() / 1000))
+    .setIssuer(did.did())
+    .setAudience(did.did())
+    .setExpirationTime('24h')
+    .encrypt(ed.exportEDKeyPair())
+
+    console.log('jwet: ', jwet)
 })()

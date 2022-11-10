@@ -47,6 +47,22 @@ export class DID {
      * }
     */
 
+    private _didToBytes(did: string, prefix: Uint8Array): Uint8Array {
+      if(!did.startsWith(BASE58_DID_PREFIX)) {
+        throw new Error('DID encoding format must be base58btc or should include did:key:xyz... ')
+      }
+      const cutDIDBase58Key = did.slice(BASE58_DID_PREFIX.length)
+      const extractBaytes = u8a.fromString(cutDIDBase58Key, 'base58btc');
+      if( u8a.equals(extractBaytes, prefix.subarray(0, prefix.byteLength))) {
+        throw new Error(`We are expected prefix format is ${prefix}`)
+      }
+      return extractBaytes.slice(prefix.length)
+    }
+
+    extractDIDKey(did: string): Uint8Array {
+      return this._didToBytes(did, EDWARDS_DID_PREFIX);
+    }
+
     private _didFromKeyBytes(publicKeyBytes: Uint8Array, prefix: Uint8Array): string {
       const bytes = u8a.concat([prefix, publicKeyBytes])
       const base58Key = u8a.toString(bytes, "base58btc")
