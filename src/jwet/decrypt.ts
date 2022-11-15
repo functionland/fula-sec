@@ -1,35 +1,17 @@
-import { JWTVerifyOptions, JWTVerified, 
-    verifyJWT, decodeJWT }from 'did-jwt'
-import { JWTDecoded } from 'did-jwt/lib/JWT';
 import * as u8a from 'uint8arrays'
-import {ProduceJWT} from './produce.jwt.js'
-import {DID, keyPair} from '../did/did.js'
-
-// export  
-//     async function verify(
-//         jwt: string,
-//         options?: JWTVerifyOptions
-//     ): Promise<JWTVerified> {
-//         let verifyed = await verifyJWT(jwt, options);
-//         return verifyed    
-//     }
-
-
-// export 
-//     async function decode(jwt: string): Promise<JWTDecoded> {
-//         return decodeJWT(jwt)
-//     }
-
+import {DID} from '../did/did.js'
+import jwtPayload from './jwt.set.js'
 export class DecryptJWT {
-    _keyPair: keyPair
-    constructor (keyPair: keyPair) {
-        this._keyPair = keyPair;
+    _secretKey: Uint8Array
+    constructor (secretKey: Uint8Array) {
+        this._secretKey = secretKey;
     }
     
     async verify (jwet: string) {
-       const did = new DID(this._keyPair);
+       const did = new DID(this._secretKey);
        const _jwet = JSON.parse(u8a.toString(u8a.fromString(jwet, 'base64pad'))); 
-       const ciphertext = await did.decryptJWE(_jwet) 
-       return ciphertext;
+       const decrypted = await did.decryptJWE(_jwet)
+       const payload = jwtPayload(u8a.fromString(JSON.stringify(decrypted)))
+       return payload;
     }
 }

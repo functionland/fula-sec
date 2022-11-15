@@ -3,6 +3,7 @@ import { decryptJWE, createJWE, JWE,
     x25519Decrypter,
     Encrypter,
 } from 'did-jwt'
+import { generateKeyPairFromSeed } from '@stablelib/x25519'
 import {prepareCleartext, decodeCleartext } from 'dag-jose-utils'
 import * as u8a from 'uint8arrays'
 import * as crypto from 'libp2p-crypto';
@@ -24,18 +25,14 @@ export type CreateJWEOptions = {
 export type DecryptJWEOptions = {
     did?: string
 }
-  
-export type keyPair = {
-  publicKey: string,
-  secretKey: string
-}
+
 export class DID {
     publicKey: Uint8Array;
     private _privateKey: Uint8Array;
     
-    constructor(_keyPair: keyPair) {
-      this.publicKey = u8a.fromString(_keyPair.publicKey, 'base64pad');
-      this._privateKey = u8a.fromString(_keyPair.secretKey, 'base64pad');
+    constructor(secretKey: Uint8Array) {
+      this._privateKey = secretKey.slice(0, 32),
+      this.publicKey = generateKeyPairFromSeed(this._privateKey).publicKey
     }
 
     private _didToBytes(did: string, prefix: Uint8Array): Uint8Array {
@@ -43,7 +40,7 @@ export class DID {
         throw new Error('DID encoding format must be base58btc or should include did:key:xyz... ')
       }
       const cutDIDBase58Key = did.slice(BASE58_DID_PREFIX.length)
-      const extractBaytes = u8a.fromString(cutDIDBase58Key, 'base58btc');
+      const extractBaytes = u8a.fromString(cutDIDBase58Key, 'base58btc')
       if( u8a.equals(extractBaytes, prefix.subarray(0, prefix.byteLength))) {
         throw new Error(`We are expected prefix format is ${prefix}`)
       }
@@ -96,7 +93,7 @@ export class DID {
      */
  
     private async _keyPair (privateKey: Uint8Array):Promise<crypto.keys.supportedKeys.ed25519.Ed25519PrivateKey> {
-      return await crypto.keys.generateKeyPairFromSeed('Ed25519', privateKey.slice(0, 32), 512) 
+      return await crypto.keys.generateKeyPairFromSeed('Ed25519', privateKey, 512) 
     };
 
     /**
