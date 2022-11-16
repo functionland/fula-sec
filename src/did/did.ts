@@ -3,6 +3,7 @@ import { decryptJWE, createJWE, JWE,
     x25519Decrypter,
     Encrypter,
 } from 'did-jwt'
+import { generateKeyPairFromSeed } from '@stablelib/x25519'
 import {prepareCleartext, decodeCleartext } from 'dag-jose-utils'
 import * as u8a from 'uint8arrays'
 import * as crypto from 'libp2p-crypto';
@@ -24,28 +25,38 @@ export type CreateJWEOptions = {
 export type DecryptJWEOptions = {
     did?: string
 }
-  
-export type keyPair = {
-  publicKey: string,
-  secretKey: string
-}
+
 export class DID {
     publicKey: Uint8Array;
     private _privateKey: Uint8Array;
     
-    constructor(_keyPair: keyPair) {
-      this.publicKey = u8a.fromString(_keyPair.publicKey, 'base64pad');
-      this._privateKey = u8a.fromString(_keyPair.secretKey, 'base64pad');
+    constructor(secretKey: Uint8Array) {
+      this._privateKey = secretKey.slice(0, 32),
+      this.publicKey = generateKeyPairFromSeed(this._privateKey).publicKey
+    }
+
+    private _didToBytes(did: string, prefix: Uint8Array): Uint8Array {
+      if(!did.startsWith(BASE58_DID_PREFIX)) {
+        throw new Error('DID encoding format must be base58btc or should include did:key:xyz... ')
+      }
+      const cutDIDBase58Key = did.slice(BASE58_DID_PREFIX.length)
+      const extractBaytes = u8a.fromString(cutDIDBase58Key, 'base58btc')
+      if( u8a.equals(extractBaytes, prefix.subarray(0, prefix.byteLength))) {
+        throw new Error(`We are expected prefix format is ${prefix}`)
+      }
+      return extractBaytes.slice(prefix.length)
     }
 
     /**
-     * This function for generating DID and PeerID
-     * @function getDID()
-     * @property parentKey?: Uin8Array (Optinal) or _privateKey (default)
-     * @returns  {
-     *  PeerId, did 
-     * }
+     * This function extracts Public key from DID - base58btc
+     * @function extractDIDKey(did)
+     * @property did: string
+     * @returns  PublicKey: Uint8Array
     */
+
+    extractDIDKey(did: string): Uint8Array {
+      return this._didToBytes(did, EDWARDS_DID_PREFIX);
+    }
 
     private _didFromKeyBytes(publicKeyBytes: Uint8Array, prefix: Uint8Array): string {
       const bytes = u8a.concat([prefix, publicKeyBytes])
@@ -53,9 +64,21 @@ export class DID {
       return BASE58_DID_PREFIX + base58Key
     }
 
+    /**
+     * This function makes DID (base58btc) from PublicKey
+     * @function extractDIDKey(did)
+     * @returns  did: string
+    */
     did(): string {
       return this._didFromKeyBytes(this.publicKey, EDWARDS_DID_PREFIX)
     }
+
+    /**
+     * This function makes PeerId KeyPair from DID KeyPair
+     * @function pid(privateKey)
+     * @property privateKey?: Uint8Array
+     * @returns  PeerId KeyPair: json object
+    */
 
     async pid (privateKey?: Uint8Array): Promise<PeerId.JSONPeerId> {
       const key = await this._keyPair(privateKey || this._privateKey);
@@ -70,7 +93,7 @@ export class DID {
      */
  
     private async _keyPair (privateKey: Uint8Array):Promise<crypto.keys.supportedKeys.ed25519.Ed25519PrivateKey> {
-      return await crypto.keys.generateKeyPairFromSeed('Ed25519', privateKey.slice(0, 32), 512) 
+      return await crypto.keys.generateKeyPairFromSeed('Ed25519', privateKey, 512) 
     };
 
     /**

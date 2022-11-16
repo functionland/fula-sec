@@ -1,4 +1,4 @@
-import { HDKEY, DID } from './lib/esm/index.js';
+import { HDKEY, DID } from '../lib/esm/index.js';
 
 
 (async()=> {
@@ -16,8 +16,9 @@ import { HDKEY, DID } from './lib/esm/index.js';
     const subKey = ed.deriveKeyPath("m/0'/0'");
     console.log('subKey: ', subKey)
     console.log('exportKeyPath: ', ed.exportKeyPath("m/0'/0'"))
+
+    
     const did = new DID(ed.exportEDKeyPair());
     console.log('did: ', did.did());
     console.log('pid: ', await did.pid());
-
 })()

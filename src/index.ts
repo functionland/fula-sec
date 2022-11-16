@@ -1,3 +1,4 @@
 export * from './did/did.js';
 export * from './did/hkey/key.js';
-export * as fulaJWT from './auth/access/index.js';
+export * from './jwet/encrypt.js'
+export * from './jwet/decrypt.js'

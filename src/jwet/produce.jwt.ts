@@ -1,7 +1,7 @@
 import { JWTPayload} from 'did-jwt'
-import isObject from '../../utils/isObject.js'
-import cycle from '../../utils/cycle.js';
-import secs from '../../utils/time.js';
+import isObject from '../utils/isObject.js'
+import cycle from '../utils/cycle.js';
+import secs from '../utils/time.js';
 
 export class ProduceJWT {
     protected _payload!: Partial<JWTPayload>;
