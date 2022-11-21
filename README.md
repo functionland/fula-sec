@@ -55,7 +55,7 @@ Install NPM package
 
     /* Prefix moc keys */
     let password = '123456789'  //User`s password
-    let signedKey = '9d7020006cf0696334ead54fffb859a8253e5a44860c211d23c7b6bf842d0c63535a5efd266a647cabdc4392df9a4ce28db7dc393318068d93bf33a32adb81ae'; // signedKey from metamask
+    let signedKey = '9d7020006cf0696334ead54fffb859a8253e5a44860c211d23c7b6bf842d0c63535a5efd266a647cabdc4392df9a4ce28db7dc393318068d93bf33a32adb81ae'; // signedKey is the signature coming from the locally-running service of a 3rd party signing authority like Meta Mask Wallet by signing part of the password (not the full password is being sent to the 3rd party signing authority)
 
     
     /* 1 - Add user`s password */
@@ -65,7 +65,7 @@ Install NPM package
     // B. Get signedKey         |signedKey| <---  |Metamask| 
 
     /* 2 - Get chainCode to get signedKey from Metamask*/
-    const chainCode = ed.chainCode;
+    const chainCode = ed.chainCode; // chainCode is created from part of the password to be sent to the signing authority like MetaMask wallet to get a unique signature back*
     `type:base64pad APSWnk8ULP/v//oseMeSEDadMBSSeX/SOxOREYhjQ7g=`
     /* Send request to metamask*/
 
