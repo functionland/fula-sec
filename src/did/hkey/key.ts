@@ -26,7 +26,6 @@ export class HDKEY {
     private _Key!: Keys;
     private _secretKey!: Uint8Array;
     chainCode: string;
-    hexSeed: string | undefined;
 
     constructor(password: string) {
         this.chainCode = this._splitKey(password);
@@ -61,9 +60,9 @@ export class HDKEY {
 
     createEDKeyPair(signedKey: Hex): EdKey.EdKeypair {
         const key = u8a.toString(this._Key.key, 'base64pad')
-        this.hexSeed = sha3.keccak256(key.concat(signedKey));
+        const hexSeed = sha3.keccak256(key.concat(signedKey));
         const hmac = new HMAC(SHA512, u8a.fromString(ED25519_CURVE));
-        const secretKey = hmac.update(u8a.fromString(this.hexSeed, 'hex')).digest();
+        const secretKey = hmac.update(u8a.fromString(hexSeed, 'hex')).digest();
         this._secretKey = secretKey;
         return EdKey.EdKeypair.fromSecretKey(u8a.toString(this._secretKey, 'base64pad'));
     };

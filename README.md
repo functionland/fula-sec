@@ -53,31 +53,62 @@ Install NPM package
     import {HDKEY, DID} from '@functionland/fula-sec'
 
 
-    // Prefix moc keys
-    let secretKey = '123456789'
-    let signedKey = '9d7020006cf0696334ead54fffb859a8253e5a44860c211d23c7b6bf842d0c63535a5efd266a647cabdc4392df9a4ce28db7dc393318068d93bf33a32adb81ae';
+    /* Prefix moc keys */
+    let password = '123456789'  //User`s password
+    let signedKey = '9d7020006cf....f33a32adb81ae'; 
+    /* signedKey is the signature coming from the locally-running 
+    service of a 3rd party signing authority like Meta Mask Wallet 
+    by signing part of the password (not the full password is being 
+    sent to the 3rd party signing authority)
+    */
 
     
-    /* Add user`s secretKey */
-    const ed = new HDKEY(secretKey);
+    /* 1 - Add user`s password */
+    const ed = new HDKEY(password);
     
-    // 1. Sign with chaincode   |chainCode| --->  |Metamask|      
-    // 2. Get signedKey         |signedKey| <---  |Metamask| 
+    // A. Sign with chaincode   |chainCode| --->  |Metamask|      
+    // B. Get signedKey         |signedKey| <---  |Metamask| 
 
-    /* Get chainCode to get signedKey from Metamask*/
-    const chainCode = ed.chainCode;
+    /* 2 - Get chainCode to get signedKey from Metamask*/
+    const chainCode = ed.chainCode; 
+    /*
+      chainCode is created from part of the password to be sent 
+      to the signing authority like MetaMask wallet to get a unique signature back
+    */
+    `type:base64pad APSWnk8ULP/v//oseMeSEDadMBSSeX/SOxOREYhjQ7g=`
     /* Send request to metamask*/
 
-    /* Get KeyPair: Publick and Privete Key */
+    /* 3 - Get KeyPair: Publick and Privete Key */
     const keyPair = ed.createEDKeyPair(signedKey);
-    /* Utilize keyPair for UCAN and also for DID, Encryption */
+    `secretkey:  Uint8Array(64) [
+         98,  47,  78, 171, 169, 201, 236, 231, 196,  23, 134,
+         135,  78, 180, 195,  93,  22,  57,  41, 213,  53,  86,
+         248,  34,  83, 162, 233, 128,  89, 128, 207, 173, 247,
+         94, 235,  66, 181, 212, 204, 168, 133, 182,  87, 227,
+         217, 233, 122, 169, 145,  20,  42, 110, 229, 233, 239,
+         112,  55, 203,  18, 112,  50, 251, 239, 219
+      ],
+      pubkey:  Uint8Array(32) [
+         247,  94, 235,  66, 181, 212, 204,
+         168, 133, 182,  87, 227, 217, 233,
+         122, 169, 145,  20,  42, 110, 229,
+         233, 239, 112,  55, 203,  18, 112,
+         50, 251, 239, 219
+      ]`
+    
+    /* keyPair: {
+         publicKey,
+         secretKey    
+    } for creating DID and Encrypt/Decrypt */
+    
+    
 
-    /* Add KeyPair in order to generate DID and PID*/
+    /* 4 - Add KeyPair in order to generate DID*/
     const did = new DID(keyPair.secretKey);
     
-    /* Get DID and PID */
+    /* Get DID */
     did.did();
-    await did.pid();
+   `did:key:z6MknwZL7aFNFGoq7ZaZv47LF7tiqtwV3ZrYRbAJEmUWRRkh`
    ```
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -88,7 +119,7 @@ Install NPM package
     import { EncryptJWT, DecryptJWT } from '@functionland/fula-sec'
      
      /* Securly export your wrapped wnfs key */
-     const jwet = await new EncryptJWT({ aud: did.did(), iat: undefined, wnfsKey: 'export your wnfs key'})
+     const jwet = await new EncryptJWT({ any: 'your sensitive data to encrypt'})
         .setIssuedAt()
         .setNotBefore(Math.floor(Date.now() / 1000))
         .setIssuer(did.did())
@@ -96,8 +127,17 @@ Install NPM package
         .setExpirationTime('3s')
         .encrypt(keyPair.secretKey);
 
-    /* Verify and decrypt to get your wnfs key */
+    /* Verify and decrypt to get your wnfs key within 3 second as declared above */
      const payload = await new DecryptJWT(keyPair.secretKey).verify(jwet)    
+      `payload:  {
+         aud: 'did:key:z6MknwZL7aFNFGoq7ZaZv47LF7tiqtwV3ZrYRbAJEmUWRRkh',
+         exp: 1669043742,
+         iat: 1669043738,
+         iss: 'did:key:z6MknwZL7aFNFGoq7ZaZv47LF7tiqtwV3ZrYRbAJEmUWRRkh',
+         nbf: 1669043738,
+         any: 'your sensitive data to encrypt'
+      }
+      `
    ```
 
 
