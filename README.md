@@ -62,7 +62,7 @@ Install NPM package
     const ed = new HDKEY(secretKey);
     
     // 1. Sign with chaincode   |chainCode| --->  |Metamask|      
-    // 2. Share Content         |signedKey| <---  |Metamask| 
+    // 2. Get signedKey         |signedKey| <---  |Metamask| 
 
     /* Get chainCode to get signedKey from Metamask*/
     const chainCode = ed.chainCode;

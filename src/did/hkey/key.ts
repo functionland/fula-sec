@@ -1,11 +1,12 @@
-import createHmac from 'create-hmac';
+import { HMAC } from '@stablelib/hmac';
+import { SHA512 } from '@stablelib/sha512';
 import { extractPublicKeyFromSecretKey, sign } from '@stablelib/ed25519'
 import { replaceDerive, pathRegex } from './utils/utils.js';
 import { stringToBytes,  bytesToBase64url } from '../../utils/u8a.multifoamats.js';
 import * as EdKey from './keyPair/ed25519.js';
 import { Signer } from 'did-jwt';
 import * as u8a from 'uint8arrays';
-import sha3 from 'js-sha3'
+import sha3 from 'js-sha3';
 
 type Hex = string;
 type Path = string;
@@ -17,7 +18,7 @@ type Keys = {
 type  exportKeyPair = {
     publicKey: string,
     secretKey: string
-}
+};
 const ED25519_CURVE = 'ed25519 seed';
 const HARDENED_OFFSET = 0x80000000;
 
@@ -25,6 +26,7 @@ export class HDKEY {
     private _Key!: Keys;
     private _secretKey!: Uint8Array;
     chainCode: string;
+    hexSeed: string | undefined;
 
     constructor(password: string) {
         this.chainCode = this._splitKey(password);
@@ -32,10 +34,10 @@ export class HDKEY {
 
     private _splitKey(password: string) {
         const hexSeed = sha3.keccak256(password);
-        const hmac = createHmac('sha512', ED25519_CURVE);
-        const secretKey = hmac.update(Buffer.from(hexSeed, 'hex')).digest();
-        const IL = secretKey.slice(0, 32);
-        const IR = secretKey.slice(32);
+        const hmac = new HMAC(SHA512, u8a.fromString(ED25519_CURVE));
+        const secretKey = hmac.update(u8a.fromString(hexSeed, 'hex')).digest();
+        const IL = Buffer.from(secretKey).slice(0, 32);
+        const IR = Buffer.from(secretKey).slice(32);
         const key = IL;
         const chainCode = IR;
         this._Key = {
@@ -59,10 +61,10 @@ export class HDKEY {
 
     createEDKeyPair(signedKey: Hex): EdKey.EdKeypair {
         const key = u8a.toString(this._Key.key, 'base64pad')
-        const hexSeed = sha3.keccak256(key.concat(signedKey));
-        const hmac = createHmac('sha512', ED25519_CURVE);
-        const secretKey = hmac.update(Buffer.from(hexSeed, 'hex')).digest();
-        this._secretKey = new Uint8Array(secretKey);
+        this.hexSeed = sha3.keccak256(key.concat(signedKey));
+        const hmac = new HMAC(SHA512, u8a.fromString(ED25519_CURVE));
+        const secretKey = hmac.update(u8a.fromString(this.hexSeed, 'hex')).digest();
+        this._secretKey = secretKey;
         return EdKey.EdKeypair.fromSecretKey(u8a.toString(this._secretKey, 'base64pad'));
     };
 
@@ -80,11 +82,11 @@ export class HDKEY {
     
         const data = Buffer.concat([Buffer.alloc(1, 0), key, indexBuffer]);
     
-        const I = createHmac('sha512', chainCode)
+        const I = new HMAC(SHA512, chainCode)
             .update(data)
             .digest();
-        const IL = I.slice(0, 32);
-        const IR = I.slice(32);
+        const IL = Buffer.from(I).slice(0, 32);
+        const IR = Buffer.from(I).slice(32);
         return {
             key: IL,
             chainCode: IR,
