@@ -1,8 +1,7 @@
 {
   "name": "@functionland/fula-sec",
-  "version": "1.0.0",
-  "description": "",
-  "private": true,
+  "version": "1.0.2",
+  "description": "This library provides security features of Fula Protocol",
   "type": "module",
   "main": "./lib/cjs/index.js",
   "module": "./lib/esm/index.js",
@@ -10,9 +9,9 @@
     "build": "tsc -p tsconfig.json && tsc -p tsconfig-cjs.json",
     "lint": "eslint . --ext .ts"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": ["encryption", "jwe", "jwt", "jwet", "token", "fula"],
+  "author": "Jamshid Saidov <https://github.com/Ruffiano>",
+  "license": "MIT",
   "devDependencies": {
     "@babel/preset-typescript": "^7.18.6",
     "@esbuild-plugins/node-globals-polyfill": "~0.1.1",
