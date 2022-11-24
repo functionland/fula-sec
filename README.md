@@ -33,7 +33,7 @@
 #
 The Fula-sec library allows you to create DID (Decentrlized-ID) and Encript/Decypt by using `Ed25519` and `EDHD` algorithms.
 
-`Ed25519` KeyPairs are used for creating DID, PID (Peer-Id), JWE/JWET/JWT signing identity of token which is passed as `iss:` attribyte of the payload. In same way opposite side user can verify or/and decrypt by passing their own KeyPair.   
+`Ed25519` KeyPairs are used for creating DID, JWE/JWET/JWT signing identity of token which is passed as `iss:` attribyte of the payload. In same way opposite side user can verify or/and decrypt by passing their own KeyPair.   
 
 
 ## Installation
@@ -148,7 +148,6 @@ Install NPM package
 ## Content
 - [X] HDKEY Drive
 - [X] Identity (DID)
-- [X] PeerId (PID)
 - [X] JWE
 - [X] JWET
 

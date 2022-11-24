@@ -16,17 +16,13 @@
     "@babel/preset-typescript": "^7.18.6",
     "@esbuild-plugins/node-globals-polyfill": "~0.1.1",
     "@esbuild-plugins/node-modules-polyfill": "~0.1.4",
-    "@types/lodash": "^4.14.182",
     "@types/node": "^17.0.21",
-    "@types/secp256k1": "^4.0.3",
-    "@types/tape": "^4.13.2",
     "@typescript-eslint/eslint-plugin": "^5.13.0",
     "@typescript-eslint/parser": "^5.13.0",
     "esbuild": "~0.14.25",
     "esbuild-plugin-babel": "^0.2.3",
     "esbuild-runner": "~2.2.1",
     "eslint": "^8.10.0",
-    "ts-node": "^10.6.0",
     "typescript": "^4.6.2",
     "uint8arrays": "^3.0.0"
   },
@@ -36,14 +32,9 @@
     "@stablelib/x25519": "^1.0.2",
     "dag-jose-utils": "^2.0.0",
     "did-jwt": "^5.12.4",
-    "it-all": "^1.0.6",
-    "libp2p-crypto": "^0.21.2",
-    "lodash": "^4.17.11",
     "multiformats": "^9.6.4",
-    "peer-id": "^0.16.0",
-    "secp256k1": "^4.0.3",
-    "tslib": "^2.4.0",
-    "uint8arrays": "^3.0.0"
+    "uint8arrays": "^3.0.0",
+    "tslib": "^2.4.0"
   },
   "files": [
     "lib/**/*"
