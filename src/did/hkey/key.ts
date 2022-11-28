@@ -15,7 +15,8 @@ type Keys = {
     key: Buffer;
     chainCode: Buffer;
 };
-type  exportKeyPair = {
+
+export type exportKeyPair = {
     publicKey: string,
     secretKey: string
 };

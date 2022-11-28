@@ -4,7 +4,6 @@ import { decryptJWE, createJWE, JWE,
     Encrypter,
 } from 'did-jwt'
 import { generateKeyPairFromSeed } from '@stablelib/x25519'
-import {prepareCleartext, decodeCleartext } from 'dag-jose-utils'
 import * as u8a from 'uint8arrays'
 import { InvalidDid } from '../did/utils/errors.js';
 import { BASE58_DID_PREFIX, EDWARDS_DID_PREFIX } from "./utils/encode.prefix.js"
@@ -136,14 +135,14 @@ export class DID {
    */
 
     async createJWE(
-      cleartext: Record<string, any>,
+      cleartext: string,
       recipients: Encrypter[] | Array<Uint8Array>,
       options: CreateJWEOptions = {}
     ): Promise<JWE> {
       if(!recipients.map((key:any)=>  { return key.alg }).includes('ECDH-ES+XC20PKW')) {
       recipients = this._encrypter(recipients as Array<Uint8Array>);
       }
-      const preparedCleartext = await prepareCleartext(cleartext);
+      const preparedCleartext = u8a.fromString(cleartext);
       return await createJWE(preparedCleartext, recipients as Encrypter[], options.protectedHeader, options.aad)
     }
 
@@ -153,9 +152,9 @@ export class DID {
    * @property jwe                 The JWE to decrypt
    */
 
-    async decryptJWE(jwe: JWE): Promise<Record<string, any>> {
+    async decryptJWE(jwe: JWE): Promise<string> {
       let decrypter = this._decrypter();
       const bytes = await decryptJWE(jwe, decrypter)
-      return decodeCleartext(bytes)
+      return u8a.toString(bytes)
     }
 }

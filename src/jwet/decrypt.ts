@@ -11,7 +11,7 @@ export class DecryptJWT {
        const did = new DID(this._secretKey);
        const _jwet = JSON.parse(u8a.toString(u8a.fromString(jwet, 'base64pad'))); 
        const decrypted = await did.decryptJWE(_jwet)
-       const payload = jwtPayload(u8a.fromString(JSON.stringify(decrypted)))
+       const payload = jwtPayload(u8a.fromString(decrypted))
        return payload;
     }
 }

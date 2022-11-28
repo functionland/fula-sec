@@ -1,12 +1,24 @@
 {
   "name": "@functionland/fula-sec",
-  "version": "1.0.2",
+  "version": "2.0.0",
   "description": "This library provides security features of Fula Protocol",
   "type": "module",
-  "main": "./lib/cjs/index.js",
-  "module": "./lib/esm/index.js",
+  "browser": "./lib/esm/index.js",
+  "types": "./lib/esm/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/esm/index.d.ts",
+      "browser": {
+        "default": "./lib/esm/index.js"
+      },
+      "node": {
+        "require": "./lib/cjs/index.js"
+      }
+    }
+  },
   "scripts": {
-    "build": "tsc -p tsconfig.json && tsc -p tsconfig-cjs.json",
+    "build": "rm -rf lib && node scripts/build.mjs && tsc",
+    "start": "node examples/jwet.encryption.js",
     "lint": "eslint . --ext .ts"
   },
   "keywords": ["encryption", "jwe", "jwt", "jwet", "token", "fula"],
@@ -24,19 +36,23 @@
     "esbuild-runner": "~2.2.1",
     "eslint": "^8.10.0",
     "typescript": "^4.6.2",
-    "uint8arrays": "^3.0.0"
+    "uint8arrays": "^3.0.0",
+    "npm-dts": "^1.3.11"
   },
   "dependencies": {
     "@stablelib/hmac": "^1.0.1",
     "@stablelib/sha512": "^1.0.1",
     "@stablelib/x25519": "^1.0.2",
-    "dag-jose-utils": "^2.0.0",
     "did-jwt": "^5.12.4",
-    "multiformats": "^9.6.4",
     "uint8arrays": "^3.0.0",
     "tslib": "^2.4.0"
   },
   "files": [
-    "lib/**/*"
-  ]
+    "lib/**/*",
+    "examples/*",
+    "scripts/*"
+  ],
+  "engines": {
+    "node": ">=16.0.0"
+  }
 }
