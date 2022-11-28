@@ -1,37 +1,30 @@
 {
   "compilerOptions": {
     "downlevelIteration": true,
-    "outDir": "./lib/esm",
-    "module": "es6",
+    "outDir": "./build",
+    "module": "ESNext",
     "moduleResolution": "node",
     "sourceMap": true,
     "lib": ["ES2019", "esnext", "dom"],
     "target": "ES2019",
     "allowJs": true,
     "strict": true,
-    "declaration": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
     "noImplicitAny": false,
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "importHelpers": true,
+    "importHelpers": false,
     "skipLibCheck": true,
-  },
-  "paths": {
-    "*": ["types/*"]
-  },
-  "typedocOptions": {
-    "entryPoints": ["src/index.ts"],
-    "out": "docs"
+    "emitDeclarationOnly": true,
+    "declaration": true
   },
   "include": [
     "src/**/*",
-    "__tests__/**/*"
   ],
   "exclude": [
+    "**/*.test.ts",
+    "scripts/**/*",
     "node_modules",
-    "scripts",
+    "lib"
   ]
 }

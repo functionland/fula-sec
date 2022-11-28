@@ -4,10 +4,7 @@ import { decryptJWE, createJWE, JWE,
     Encrypter,
 } from 'did-jwt'
 import { generateKeyPairFromSeed } from '@stablelib/x25519'
-import {prepareCleartext, decodeCleartext } from 'dag-jose-utils'
 import * as u8a from 'uint8arrays'
-import * as crypto from 'libp2p-crypto';
-import * as PeerId from 'peer-id'
 import { InvalidDid } from '../did/utils/errors.js';
 import { BASE58_DID_PREFIX, EDWARDS_DID_PREFIX } from "./utils/encode.prefix.js"
 /**
@@ -72,55 +69,7 @@ export class DID {
     did(): string {
       return this._didFromKeyBytes(this.publicKey, EDWARDS_DID_PREFIX)
     }
-
-    /**
-     * This function makes PeerId KeyPair from DID KeyPair
-     * @function pid(privateKey)
-     * @property privateKey?: Uint8Array
-     * @returns  PeerId KeyPair: json object
-    */
-
-    async pid (privateKey?: Uint8Array): Promise<PeerId.JSONPeerId> {
-      const key = await this._keyPair(privateKey || this._privateKey);
-      return this._generatePeerId(key);
-    }
-
-     /**
-     * This private helper function for generate key pair
-     * @function _keyPair()
-     * @property parentKey: Uin8Array
-     * @returns  Public and PrivateKeys for peerId
-     */
- 
-    private async _keyPair (privateKey: Uint8Array):Promise<crypto.keys.supportedKeys.ed25519.Ed25519PrivateKey> {
-      return await crypto.keys.generateKeyPairFromSeed('Ed25519', privateKey, 512) 
-    };
-
-    /**
-     * This private helper function for generate DID
-     * @function _generateDID()
-     * @property key: crypto.PrivateKey
-     * @returns  { PeerId.JSONPeerId }
-     */
-
-    private async _generatePeerId (key: crypto.PrivateKey): Promise<PeerId.JSONPeerId> {
-      const identifier = await this._createPeerId(key);
-      return identifier.toJSON()
-    };
      
-    /**
-     * This private helper function for generate peer-id
-     * @function _createPeerId()
-     * @property key: crypto.PrivateKey
-     * @returns  PeerId
-     */
-
-    private async _createPeerId (key: crypto.PrivateKey): Promise<PeerId> {
-      let _privateKey = crypto.keys.marshalPrivateKey(key, 'ed25519')
-      const peerId = await PeerId.createFromPrivKey(_privateKey);
-      return peerId;
-    };
-
      /**
      * This function for parseDID
      * @function parseDID()
@@ -186,14 +135,14 @@ export class DID {
    */
 
     async createJWE(
-      cleartext: Record<string, any>,
+      cleartext: string,
       recipients: Encrypter[] | Array<Uint8Array>,
       options: CreateJWEOptions = {}
     ): Promise<JWE> {
       if(!recipients.map((key:any)=>  { return key.alg }).includes('ECDH-ES+XC20PKW')) {
       recipients = this._encrypter(recipients as Array<Uint8Array>);
       }
-      const preparedCleartext = await prepareCleartext(cleartext);
+      const preparedCleartext = u8a.fromString(cleartext);
       return await createJWE(preparedCleartext, recipients as Encrypter[], options.protectedHeader, options.aad)
     }
 
@@ -203,9 +152,9 @@ export class DID {
    * @property jwe                 The JWE to decrypt
    */
 
-    async decryptJWE(jwe: JWE): Promise<Record<string, any>> {
+    async decryptJWE(jwe: JWE): Promise<string> {
       let decrypter = this._decrypter();
       const bytes = await decryptJWE(jwe, decrypter)
-      return decodeCleartext(bytes)
+      return u8a.toString(bytes)
     }
 }

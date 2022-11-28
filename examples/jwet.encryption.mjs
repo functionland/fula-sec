@@ -1,4 +1,4 @@
-import { HDKEY, DID, EncryptJWT, DecryptJWT } from '../lib/esm/index.js';
+import { HDKEY, DID, EncryptJWT, DecryptJWT } from '../lib/cjs/index.js';
 
 (async()=> {
     /* Prefix moc keys */
